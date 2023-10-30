@@ -42,6 +42,13 @@ void loadDataFromFile(std::vector<Player>& players, const std::string& filename)
             std::getline(iss, player.fullName, ',');
             std::getline(iss, player.dateOfBirth, ',');
             iss >> player.gamesPlayed >> player.goalsScored >> player.yellowCards >> player.redCards;
+            if (!(iss >> player.gamesPlayed >> player.goalsScored >> player.yellowCards >> player.redCards)) {
+                // Не удалось корректно считать значения, установил их в 0
+                player.gamesPlayed = 0;
+                player.goalsScored = 0;
+                player.yellowCards = 0;
+                player.redCards = 0;
+            }
             players.push_back(player);
         }
         file.close();
@@ -71,6 +78,7 @@ void addPlayer(std::vector<Player>& players) {
 
     players.push_back(player);
     std::cout << "Игрок добавлен." << std::endl;
+    //saveDataToFile(players, "football_players.txt");
 }
 
 void editPlayer(std::vector<Player>& players) {
@@ -120,9 +128,11 @@ void printPlayers(const std::vector<Player>& players) {
     for (int i = 0; i < players.size(); ++i) {
         const Player& player = players[i];
         std::cout << "Игрок #" << i << ": " << player.fullName << " (Дата рождения: "
-            << player.dateOfBirth << ", Забитых мячей: " << player.goalsScored << ")" << std::endl;
+            << player.dateOfBirth << ", Забитых мячей: " << player.goalsScored
+            << ", Желтых карточек: " << player.yellowCards << ", Красных карточек: " << player.redCards << ")" << std::endl;
     }
 }
+
 
 void sortPlayers(std::vector<Player>& players, int field) {
     switch (field) {
@@ -130,21 +140,25 @@ void sortPlayers(std::vector<Player>& players, int field) {
         std::sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return a.dateOfBirth < b.dateOfBirth;
             });
+        printPlayers(players);
         break;
     case 2:
         std::sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return a.gamesPlayed > b.gamesPlayed;
             });
+        printPlayers(players);
         break;
     case 3:
         std::sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return a.goalsScored > b.goalsScored;
             });
+        printPlayers(players);
         break;
     case 4:
         std::sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return (a.yellowCards + a.redCards) > (b.yellowCards + b.redCards);
             });
+        printPlayers(players);
         break;
     default:
         std::cout << "Недопустимое поле сортировки." << std::endl;
@@ -163,17 +177,35 @@ void searchPlayers(const std::vector<Player>& players, const std::string& search
     }
 }
 
-int main() {
-    std::locale::global(std::locale(""));
-    std::vector<Player> players;
-    std::string filename = "football_players.txt";
+void displayAbout() {
+    std::cout << "О программе:" << std::endl;
+    std::cout << "Версия программы: 1.0" << std::endl;
+    std::cout << "Дата последних изменений: 2023-10-30" << std::endl;
+    std::cout << "Автор: Ваше имя и контактная информация" << std::endl;
+}
 
+void displayUserManual() {
+    std::ifstream userManual("user_manual.txt");
+    if (userManual.is_open()) {
+        std::string line;
+        while (std::getline(userManual, line)) {
+            std::cout << line << std::endl;
+        }
+        userManual.close();
+    }
+    else {
+        std::cout << "Ошибка при загрузке руководства пользователя." << std::endl;
+    }
+}
 
+void displayTask() {
+    std::cout << "Задание: ..." << std::endl;
+}
 
-    loadDataFromFile(players, filename);
+void displayFootballMenu(std::vector<Player>& players, const std::string& filename) {
     std::string searchTerm;
     while (true) {
-        std::cout << "\nВыберите действие:" << std::endl;
+        std::cout << "\nМеню \"Работа с футболистами\":" << std::endl;
         std::cout << "1. Добавить игрока" << std::endl;
         std::cout << "2. Редактировать игрока" << std::endl;
         std::cout << "3. Удалить игрока" << std::endl;
@@ -181,51 +213,104 @@ int main() {
         std::cout << "5. Сортировать игроков" << std::endl;
         std::cout << "6. Поиск игроков" << std::endl;
         std::cout << "7. Сохранить данные" << std::endl;
-        std::cout << "8. Выйти" << std::endl;
+        std::cout << "8. Вернуться в главное меню" << std::endl;
 
         int choice;
         std::cin >> choice;
+        if (!(choice)) {
+            std::cin.clear();  // Сбрасываем флаг ошибки
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Очищаем буфер ввода
+            std::cout << "Ошибка ввода. Введите цифру." << std::endl;
+        }
+        else {
+            switch (choice) {
+            case 1:
+                addPlayer(players);
+                break;
+            case 2:
+                editPlayer(players);
+                break;
+            case 3:
+                deletePlayer(players);
+                break;
+            case 4:
+                printPlayers(players);
+                break;
+            case 5:
+                std::cout << "Выберите поле для сортировки (1-4):" << std::endl;
+                std::cout << "1. Дата рождения" << std::endl;
+                std::cout << "2. Количество игр" << std::endl;
+                std::cout << "3. Количество забитых мячей" << std::endl;
+                std::cout << "4. Количество карточек" << std::endl;
+                int field;
+                std::cin >> field;
+                sortPlayers(players, field);
+                break;
+            case 6:
+                std::cin.ignore();
+                std::cout << "Введите строку для поиска: ";
+                std::getline(std::cin, searchTerm);
+                searchPlayers(players, searchTerm);
+                break;
+            case 7:
+                saveDataToFile(players, filename);
+                break;
+            case 8:
+                saveDataToFile(players, filename);
+                std::cout << "Данные сохранены. Возвращение в главное меню." << std::endl;
+                return;
+            default:
+                std::cout << "Недопустимое действие." << std::endl;
+                break;
+            }
+        }
+    }
+}
 
-        switch (choice) {
-        case 1:
-            addPlayer(players);
-            break;
-        case 2:
-            editPlayer(players);
-            break;
-        case 3:
-            deletePlayer(players);
-            break;
-        case 4:
-            printPlayers(players);
-            break;
-        case 5:
-            std::cout << "Выберите поле для сортировки (1-4):" << std::endl;
-            std::cout << "1. Дата рождения" << std::endl;
-            std::cout << "2. Количество игр" << std::endl;
-            std::cout << "3. Количество забитых мячей" << std::endl;
-            std::cout << "4. Количество карточек" << std::endl;
-            int field;
-            std::cin >> field;
-            sortPlayers(players, field);
-            break;
-        case 6:
-            std::cin.ignore();
-            std::cout << "Введите строку для поиска: ";
-            
-            std::getline(std::cin, searchTerm);
-            searchPlayers(players, searchTerm);
-            break;
-        case 7:
-            saveDataToFile(players, filename);
-            break;
-        case 8:
-            saveDataToFile(players, filename);
-            std::cout << "Данные сохранены. Программа завершена." << std::endl;
-            return 0;
-        default:
-            std::cout << "Недопустимое действие." << std::endl;
-            break;
+int main() {
+    std::locale::global(std::locale(""));
+    std::vector<Player> players;
+    std::string filename = "football_players.txt";
+
+    loadDataFromFile(players, filename);
+
+    while (true) {
+        std::cout << "\nГлавное меню:" << std::endl;
+        std::cout << "1. Работа с футболистами" << std::endl;
+        std::cout << "2. О программе" << std::endl;
+        std::cout << "3. Руководство пользователя" << std::endl;
+        std::cout << "4. Задание" << std::endl;
+        std::cout << "5. Выйти" << std::endl;
+
+        int choice;
+        std::cin >> choice;
+        if (!(choice)) {
+            std::cin.clear();  // Сбрасываем флаг ошибки
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Очищаем буфер ввода
+            std::cout << "Ошибка ввода. Введите цифру." << std::endl;
+        }
+        else {
+            switch (choice) {
+            case 1:
+                displayFootballMenu(players, filename);
+                break;
+            case 2:
+                displayAbout();
+                break;
+            case 3:
+                displayUserManual();
+                break;
+            case 4:
+                displayTask();
+                break;
+            case 5:
+                //saveDataToFile(players, filename);
+                std::cout << "Программа завершена." << std::endl;
+                return 0;
+            default:
+                std::cout << "Недопустимое действие." << std::endl;
+                break;
+            }
         }
     }
 
