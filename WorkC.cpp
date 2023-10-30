@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sstream>
 #include <locale>
+#include <regex>
 
 struct Player {
     std::string fullName;
@@ -23,10 +24,15 @@ void saveDataToFile(const std::vector<Player>& players, const std::string& filen
                 << "," << player.goalsScored << "," << player.yellowCards << "," << player.redCards << "\n";
         }
         file.close();
-        std::cout << "Данные сохранены в файле: " << filename << std::endl;
+        if (file.good()) {
+            std::cout << "Данные успешно сохранены в файле: " << filename << std::endl;
+        }
+        else {
+            std::cout << "Ошибка при сохранении данных в файл." << std::endl;
+        }
     }
     else {
-        std::cout << "Ошибка при сохранении данных в файл." << std::endl;
+        std::cout << "Ошибка при открытии файла для записи." << std::endl;
     }
 }
 
@@ -39,25 +45,41 @@ void loadDataFromFile(std::vector<Player>& players, const std::string& filename)
         while (std::getline(file, line)) {
             Player player;
             std::istringstream iss(line);
-            std::getline(iss, player.fullName, ',');
-            std::getline(iss, player.dateOfBirth, ',');
-            iss >> player.gamesPlayed >> player.goalsScored >> player.yellowCards >> player.redCards;
-            if (!(iss >> player.gamesPlayed >> player.goalsScored >> player.yellowCards >> player.redCards)) {
-                // Не удалось корректно считать значения, установил их в 0
+            std::string fullName, dateOfBirth;
+            if (std::getline(iss, fullName, ',')) {
+                // Преобразуем имя игрока к нижнему регистру
+                std::transform(fullName.begin(), fullName.end(), fullName.begin(), ::tolower);
+                player.fullName = fullName;
+            }
+            if (std::getline(iss, dateOfBirth, ',')) {
+                player.dateOfBirth = dateOfBirth;
+            }
+            if (iss >> player.gamesPlayed >> player.goalsScored >> player.yellowCards >> player.redCards) {
+                players.push_back(player);
+            }
+            else {
+                // Если считывание не удалось, устанавливаем значения в 0
                 player.gamesPlayed = 0;
                 player.goalsScored = 0;
                 player.yellowCards = 0;
                 player.redCards = 0;
+                players.push_back(player);
             }
-            players.push_back(player);
         }
         file.close();
-        std::cout << "Данные загружены из файла: " << filename << std::endl;
+        if (file.good()) {
+            std::cout << "Данные успешно загружены из файла: " << filename << std::endl;
+        }
+        else {
+            std::cout << "Ошибка при чтении данных из файла." << std::endl;
+        }
     }
     else {
-        std::cout << "Ошибка при загрузке данных из файла." << std::endl;
+        std::cout << "Ошибка при открытии файла для чтения." << std::endl;
     }
 }
+
+
 
 void addPlayer(std::vector<Player>& players) {
     Player player;
@@ -78,7 +100,6 @@ void addPlayer(std::vector<Player>& players) {
 
     players.push_back(player);
     std::cout << "Игрок добавлен." << std::endl;
-    //saveDataToFile(players, "football_players.txt");
 }
 
 void editPlayer(std::vector<Player>& players) {
@@ -127,11 +148,14 @@ void printPlayers(const std::vector<Player>& players) {
     std::cout << "Список игроков:" << std::endl;
     for (int i = 0; i < players.size(); ++i) {
         const Player& player = players[i];
+        int yellowCards = player.yellowCards < 0 ? 0 : player.yellowCards;
+        int redCards = player.redCards < 0 ? 0 : player.redCards;
         std::cout << "Игрок #" << i << ": " << player.fullName << " (Дата рождения: "
             << player.dateOfBirth << ", Забитых мячей: " << player.goalsScored
-            << ", Желтых карточек: " << player.yellowCards << ", Красных карточек: " << player.redCards << ")" << std::endl;
+            << ", Желтых карточек: " << yellowCards << ", Красных карточек: " << redCards << ")" << std::endl;
     }
 }
+
 
 
 void sortPlayers(std::vector<Player>& players, int field) {
@@ -304,7 +328,6 @@ int main() {
                 displayTask();
                 break;
             case 5:
-                //saveDataToFile(players, filename);
                 std::cout << "Программа завершена." << std::endl;
                 return 0;
             default:
