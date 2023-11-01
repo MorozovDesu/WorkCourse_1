@@ -280,6 +280,7 @@ void displayAbout() {
 }
 
 void displayUserManual() {
+    setlocale(LC_ALL, "ru_RU.UTF-8");
     ifstream userManual("user_manual.txt");
     if (userManual.is_open()) {
         string line;
@@ -291,6 +292,7 @@ void displayUserManual() {
     else {
         cout << "Ошибка при загрузке руководства пользователя." << endl;
     }
+    locale::global(locale(""));
 }
 
 void displayTask() {
