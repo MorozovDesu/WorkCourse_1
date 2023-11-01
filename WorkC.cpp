@@ -91,24 +91,83 @@ void loadDataFromFile(vector<Player>& players, const string& filename) {
     cout << "Данные успешно загружены из файла: " << filename << endl;
 }
 
+bool isValidDate(const string& date) {
+    // Проверка даты с использованием регулярного выражения
+    regex datePattern(R"(\d{2}\.\d{2}\.\d{4})");
+    if (!regex_match(date, datePattern)) {
+        return false;
+    }
 
+    // Разбиваем дату на день, месяц и год
+    istringstream dateStream(date);
+    string dayStr, monthStr, yearStr;
+    getline(dateStream, dayStr, '.');
+    getline(dateStream, monthStr, '.');
+    getline(dateStream, yearStr, '.');
+
+    int day = stoi(dayStr);
+    int month = stoi(monthStr);
+    int year = stoi(yearStr);
+
+    // Проверяем диапазоны для дня, месяца и года
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2023) {
+        return false;
+    }
+
+    return true;
+}
+
+bool isLatinCharacters(const string& text) {
+    // Проверка, что текст состоит только из латинских букв
+    regex latinPattern(R"([a-zA-Z\s]+)");
+    return regex_match(text, latinPattern);
+}
 
 void addPlayer(vector<Player>& players) {
     Player player;
     cin.ignore();
     cout << "Введите данные для нового игрока:" << endl;
-    cout << "Ф.И.О. игрока: ";
-    getline(cin, player.fullName);
-    cout << "Дата рождения: ";
-    getline(cin, player.dateOfBirth);
-    cout << "Количество игр: ";
-    cin >> player.gamesPlayed;
-    cout << "Количество забитых мячей: ";
-    cin >> player.goalsScored;
-    cout << "Количество желтых карточек: ";
-    cin >> player.yellowCards;
-    cout << "Количество красных карточек: ";
-    cin >> player.redCards;
+
+    // Ввод Ф.И.О. игрока
+    string fullName;
+    do {
+        cout << "Ф.И.О. игрока (латинскими буквами): ";
+        getline(cin, fullName);
+    } while (!isLatinCharacters(fullName));
+    player.fullName = fullName;
+
+    //Ввод даты рождения
+    string dateOfBirth;
+    do {
+        cout << "Дата рождения (в формате дд.мм.гггг): ";
+        getline(cin, dateOfBirth);
+    } while (!isValidDate(dateOfBirth));
+    player.dateOfBirth = dateOfBirth;
+
+
+    // Ввод количества игр
+    do {
+        cout << "Количество игр: ";
+        cin >> player.gamesPlayed;
+    } while (player.gamesPlayed < 0);
+
+    // Ввод количества забитых мячей
+    do {
+        cout << "Количество забитых мячей: ";
+        cin >> player.goalsScored;
+    } while (player.goalsScored < 0);
+
+    // Ввод количества желтых карточек
+    do {
+        cout << "Количество желтых карточек: ";
+        cin >> player.yellowCards;
+    } while (player.yellowCards < 0);
+
+    // Ввод количества красных карточек
+    do {
+        cout << "Количество красных карточек (не больше количества игр " << player.gamesPlayed << "): ";
+        cin >> player.redCards;
+    } while (player.redCards < 0 || player.redCards > player.gamesPlayed);
 
     players.push_back(player);
     cout << "Игрок добавлен." << endl;
@@ -215,9 +274,9 @@ void searchPlayers(const vector<Player>& players, const string& searchTerm) {
 
 void displayAbout() {
     cout << "О программе:" << endl;
-    cout << "Версия программы: 1.0" << endl;
-    cout << "Дата последних изменений: 2023-10-30" << endl;
-    cout << "Автор: Ваше имя и контактная информация" << endl;
+    cout << "Версия программы: 2.1" << endl;
+    cout << "Дата последних изменений: 2023-11-01" << endl;
+    cout << "Автор: Морозов Дмитрий Игоревич,https://github.com/MorozovDesu " << endl;
 }
 
 void displayUserManual() {
@@ -235,7 +294,11 @@ void displayUserManual() {
 }
 
 void displayTask() {
-    cout << "Задание: ..." << endl;
+    cout << "Составить программу, обрабатывающую сведения об игроках фут-больной команды." << endl;
+    cout << "Структура исходных данных: Ф.И.О. игрока, дата рожде-ния, количество игр, количество забитых мячей, количество карточек (жел-тых и красных)." << endl;
+    cout << "Вывести список лучших бомбардиров (первая пятерка)."<< endl;
+    cout << "Найти всех игроков, младше 20 лет, забивших более 2 голов." << endl;
+    cout << "Определить самого недисциплинированного игрока команды." << endl;
 }
 
 void displayFootballMenu(vector<Player>& players, const string& filename) {
@@ -311,7 +374,7 @@ int main() {
         loadDataFromFile(players, filename);
     }
     catch (const exception& e) {
-        cerr << "Ошибка тут: " << e.what() << endl;
+        //cerr << "Ошибка тут: " << e.what() << endl;
     }
 
     while (true) {
