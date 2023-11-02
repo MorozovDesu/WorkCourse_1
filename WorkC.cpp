@@ -303,6 +303,64 @@ void displayTask() {
     cout << "Определить самого недисциплинированного игрока команды." << endl;
 }
 
+bool isYoungScorer(const Player& player) {
+    // Проверка на возраст младше 20 и забитые мячи более 2
+    int currentYear = 2023; // Замените на текущий год, если необходимо
+    int birthYear = stoi(player.dateOfBirth.substr(6));
+    int age = currentYear - birthYear;
+
+    return (age < 20 && player.goalsScored > 2);
+}
+
+void displayTopScorers(const vector<Player>& players) {
+    vector<Player> topScorers = players;
+    sort(topScorers.begin(), topScorers.end(), [](const Player& a, const Player& b) {
+        return a.goalsScored > b.goalsScored;
+        });
+
+    cout << "Топ-5 бомбардиров:" << endl;
+    for (int i = 0; i < min(5, static_cast<int>(topScorers.size())); ++i) {
+        const Player& player = topScorers[i];
+        cout << "Игрок #" << i + 1 << ": " << player.fullName << " (Забитых мячей: " << player.goalsScored << ")" << endl;
+    }
+}
+
+void displayMostUndisciplinedPlayer(const vector<Player>& players) {
+    int maxCards = -1;
+    const Player* mostUndisciplinedPlayer = nullptr;
+
+    for (const Player& player : players) {
+        int totalCards = player.yellowCards + (2 * player.redCards); // Modify the calculation here
+        if (totalCards > maxCards) {
+            maxCards = totalCards;
+            mostUndisciplinedPlayer = &player;
+        }
+    }
+
+    if (mostUndisciplinedPlayer) {
+        cout << "Самый недисциплинированный игрок:" << endl;
+        cout << "Игрок: " << mostUndisciplinedPlayer->fullName << " (Желтых карточек: " << mostUndisciplinedPlayer->yellowCards
+            << ", Красных карточек: " << mostUndisciplinedPlayer->redCards << ")" << endl;
+    }
+    else {
+        cout << "Нет информации о недисциплинированных игроках." << endl;
+    }
+}
+
+void findYoungHighScorers(const vector<Player>& players) {
+    cout << "Игроки младше 20 лет, забившие более 2 голов:" << endl;
+    int currentYear = 2023; // Update to the current year if needed
+
+    for (const Player& player : players) {
+        int birthYear = stoi(player.dateOfBirth.substr(6));
+        int age = currentYear - birthYear;
+
+        if (age < 20 && player.goalsScored > 2) {
+            cout << "Игрок: " << player.fullName << " (Возраст: " << age << " лет, Забитых мячей: " << player.goalsScored << ")" << endl;
+        }
+    }
+}
+
 void displayFootballMenu(vector<Player>& players, const string& filename) {
     string searchTerm;
     while (true) {
@@ -313,8 +371,11 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
         cout << "4. Вывести список игроков" << endl;
         cout << "5. Сортировать игроков" << endl;
         cout << "6. Поиск игроков" << endl;
-        cout << "7. Сохранить данные" << endl;
-        cout << "8. Вернуться в главное меню" << endl;
+        cout << "7. Вывести топ-5 бомбардиров" << endl;
+        cout << "8. Вывести самого недисциплинированного игрока" << endl;
+        cout << "9. Найти всех игроков, младше 20 лет, забивших более 2 голов" << endl;
+        cout << "10. Сохранить данные" << endl;
+        cout << "11. Вернуться в главное меню" << endl;
 
         int choice;
         cin >> choice;
@@ -354,9 +415,18 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
                 searchPlayers(players, searchTerm);
                 break;
             case 7:
-                saveDataToFile(players, filename);
+                displayTopScorers(players);
                 break;
             case 8:
+                displayMostUndisciplinedPlayer(players);
+                break;
+            case 9:
+                findYoungHighScorers(players);
+                break;
+            case 10:
+                saveDataToFile(players, filename);
+                break;
+            case 11:
                 saveDataToFile(players, filename);
                 cout << "Данные сохранены. Возвращение в главное меню." << endl;
                 return;
