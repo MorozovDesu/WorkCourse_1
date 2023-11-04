@@ -227,14 +227,39 @@ void printPlayers(const vector<Player>& players) {
     }
 }
 
+void splitDateOfBirth(const string& dateOfBirth, int& day, int& month, int& year) {
+    stringstream ss(dateOfBirth);
+    string token;
+    getline(ss, token, '.');
+    day = stoi(token);
+    getline(ss, token, '.');
+    month = stoi(token);
+    getline(ss, token, '.');
+    year = stoi(token);
+}
+
+bool compareDateOfBirth(const Player& a, const Player& b) {
+    int day1, month1, year1;
+    int day2, month2, year2;
+    splitDateOfBirth(a.dateOfBirth, day1, month1, year1);
+    splitDateOfBirth(b.dateOfBirth, day2, month2, year2);
+
+    if (year1 != year2) {
+        return year1 < year2;
+    }
+    else if (month1 != month2) {
+        return month1 < month2;
+    }
+    else {
+        return day1 < day2;
+    }
+}
 
 
 void sortPlayers(vector<Player>& players, int field) {
     switch (field) {
     case 1:
-        sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
-            return a.dateOfBirth < b.dateOfBirth;
-            });
+        sort(players.begin(), players.end(), compareDateOfBirth);
         printPlayers(players);
         break;
     case 2:
