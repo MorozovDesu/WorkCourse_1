@@ -114,6 +114,16 @@ bool isValidDate(const string& date) {
         return false;
     }
 
+    if (month == 2) {
+        // Проверяем високосный год
+        bool isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+
+        // Дополнительная проверка для февраля в зависимости от високосности
+        if ((isLeapYear && (day < 1 || day > 29)) || (!isLeapYear && (day < 1 || day > 28))) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -149,19 +159,20 @@ void addPlayer(vector<Player>& players) {
     do {
         cout << "Количество игр: ";
         cin >> player.gamesPlayed;
-    } while (player.gamesPlayed < 0);
+    } while (player.gamesPlayed < 0 || player.gamesPlayed > 10000);
+
 
     // Ввод количества забитых мячей
     do {
-        cout << "Количество забитых мячей: ";
+        cout << "Количество игр: ";
         cin >> player.goalsScored;
-    } while (player.goalsScored < 0);
+    } while (player.goalsScored < 0 || player.goalsScored > 10000);
 
     // Ввод количества желтых карточек
     do {
         cout << "Количество желтых карточек: ";
         cin >> player.yellowCards;
-    } while (player.yellowCards < 0);
+    } while (player.yellowCards < 0 || player.yellowCards > 20000);
 
     // Ввод количества красных карточек
     do {
@@ -262,19 +273,19 @@ void sortPlayers(vector<Player>& players, int field) {
         sort(players.begin(), players.end(), compareDateOfBirth);
         printPlayers(players);
         break;
+    //case 2:
+    //    sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
+    //        return a.gamesPlayed > b.gamesPlayed;
+    //        });
+    //    printPlayers(players);
+    //    break;
     case 2:
-        sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
-            return a.gamesPlayed > b.gamesPlayed;
-            });
-        printPlayers(players);
-        break;
-    case 3:
         sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return a.goalsScored > b.goalsScored;
             });
         printPlayers(players);
         break;
-    case 4:
+    case 3:
         sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return (a.yellowCards + a.redCards) > (b.yellowCards + b.redCards);
             });
@@ -426,9 +437,8 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
             case 5:
                 cout << "Выберите поле для сортировки (1-4):" << endl;
                 cout << "1. Дата рождения" << endl;
-                cout << "2. Количество игр" << endl;
-                cout << "3. Количество забитых мячей" << endl;
-                cout << "4. Количество карточек" << endl;
+                cout << "2. Количество забитых голов" << endl;
+                cout << "3. Количество карточек" << endl;
                 int field;
                 cin >> field;
                 sortPlayers(players, field);
