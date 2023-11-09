@@ -348,6 +348,17 @@ bool isYoungScorer(const Player& player) {
     return (age < 20 && player.goalsScored > 2);
 }
 
+bool endsWithCsv(const string& filename) {
+    // Проверка, что имя файла оканчивается на ".csv"
+    size_t pos = filename.find_last_of('.');
+    if (pos != string::npos) {
+        string extension = filename.substr(pos + 1);
+        transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+        return extension == "csv";
+    }
+    return false;
+}
+
 void displayTopScorers(const vector<Player>& players) {
     vector<Player> topScorers = players;
     sort(topScorers.begin(), topScorers.end(), [](const Player& a, const Player& b) {
@@ -399,6 +410,7 @@ void findYoungHighScorers(const vector<Player>& players) {
 
 void displayFootballMenu(vector<Player>& players, const string& filename) {
     string searchTerm;
+    string newFilename;
     while (true) {
         cout << "\nМеню \"Работа с футболистами\":" << endl;
         cout << "1. Добавить игрока" << endl;
@@ -410,8 +422,9 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
         cout << "7. Вывести топ-5 бомбардиров" << endl;
         cout << "8. Вывести самого недисциплинированного игрока" << endl;
         cout << "9. Найти всех игроков, младше 20 лет, забивших более 2 голов" << endl;
-        cout << "10. Сохранить данные" << endl;
-        cout << "11. Вернуться в главное меню" << endl;
+        cout << "10. Сохранить данные в текущем файле (CSV формат)" << endl;
+        cout << "11. Сохранить данные в другом файле (CSV формат)" << endl;
+        cout << "12. Вернуться в главное меню" << endl;
 
         int choice;
         cin >> choice;
@@ -459,11 +472,28 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
                 findYoungHighScorers(players);
                 break;
             case 10:
-                saveDataToFile(players, filename);
+                if (endsWithCsv(filename)) {
+                    saveDataToFile(players, filename);
+                    cout << "Данные успешно сохранены в текущем файле: " << filename << endl;
+                }
+                else {
+                    cout << "Ошибка: Файл должен иметь расширение .csv для сохранения." << endl;
+                }
                 break;
             case 11:
-                saveDataToFile(players, filename);
-                cout << "Данные сохранены. Возвращение в главное меню." << endl;
+                cin.ignore();
+                cout << "Введите имя нового файла для сохранения данных: ";
+                getline(cin, newFilename);
+                if (endsWithCsv(newFilename)) {
+                    saveDataToFile(players, newFilename);
+                    cout << "Данные успешно сохранены в новом файле: " << newFilename << endl;
+                }
+                else {
+                    cout << "Ошибка: Файл должен иметь расширение .csv для сохранения." << endl;
+                }
+                break;
+            case 12:
+                cout << "Возвращение в главное меню." << endl;
                 return;
             default:
                 cout << "Недопустимое действие." << endl;
@@ -477,6 +507,7 @@ int main() {
     locale::global(locale(""));
     vector<Player> players;
     const string filename = "players.csv";
+    bool dataSaved = false;
     try {
         loadDataFromFile(players, filename);
     }
@@ -514,6 +545,15 @@ int main() {
                 displayTask();
                 break;
             case 5:
+                if (!dataSaved) {
+                    char saveChoice;
+                    cout << "Данные не были сохранены. Сохранить перед выходом? (y/n): ";
+                    cin >> saveChoice;
+                    if (saveChoice == 'y' || saveChoice == 'Y') {
+                        saveDataToFile(players, filename);
+                        cout << "Данные успешно сохранены перед выходом." << endl;
+                    }
+                }
                 cout << "Программа завершена." << endl;
                 return 0;
             default:
