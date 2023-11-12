@@ -113,17 +113,14 @@ bool isValidDate(const string& date) {
     if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2023) {
         return false;
     }
-
     if (month == 2) {
         // Проверяем високосный год
         bool isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-
         // Дополнительная проверка для февраля в зависимости от високосности
         if ((isLeapYear && (day < 1 || day > 29)) || (!isLeapYear && (day < 1 || day > 28))) {
             return false;
         }
     }
-
     return true;
 }
 
@@ -137,7 +134,6 @@ void addPlayer(vector<Player>& players) {
     Player player;
     cin.ignore();
     cout << "Введите данные для нового игрока:" << endl;
-
     // Ввод Ф.И.О. игрока
     string fullName;
     do {
@@ -145,44 +141,58 @@ void addPlayer(vector<Player>& players) {
         getline(cin, fullName);
     } while (!isLatinCharacters(fullName));
     player.fullName = fullName;
-
-    //Ввод даты рождения
+    // Ввод даты рождения
     string dateOfBirth;
     do {
         cout << "Дата рождения (в формате дд.мм.гггг): ";
         getline(cin, dateOfBirth);
     } while (!isValidDate(dateOfBirth));
     player.dateOfBirth = dateOfBirth;
-
-
-    // Ввод количества игр
+    // Ввод количества игр (только цифры)
     do {
         cout << "Количество игр: ";
         cin >> player.gamesPlayed;
+        if (cin.fail()) {
+            cin.clear();  // Сбрасываем флаг ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очищаем буфер ввода
+            cout << "Ошибка ввода. Введите цифру." << endl;
+        }
     } while (player.gamesPlayed < 0 || player.gamesPlayed > 10000);
-
-
-    // Ввод количества забитых мячей
+    // Ввод количества забитых мячей (только цифры)
     do {
-        cout << "Количество игр: ";
+        cout << "Количество забитых мячей: ";
         cin >> player.goalsScored;
+        if (cin.fail()) {
+            cin.clear();  // Сбрасываем флаг ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очищаем буфер ввода
+            cout << "Ошибка ввода. Введите цифру." << endl;
+        }
     } while (player.goalsScored < 0 || player.goalsScored > 10000);
-
-    // Ввод количества желтых карточек
+    // Ввод количества желтых карточек (только цифры)
     do {
         cout << "Количество желтых карточек: ";
         cin >> player.yellowCards;
+        if (cin.fail()) {
+            cin.clear();  // Сбрасываем флаг ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очищаем буфер ввода
+            cout << "Ошибка ввода. Введите цифру." << endl;
+        }
     } while (player.yellowCards < 0 || player.yellowCards > 20000);
-
-    // Ввод количества красных карточек
+    // Ввод количества красных карточек (только цифры)
     do {
         cout << "Количество красных карточек (не больше количества игр " << player.gamesPlayed << "): ";
         cin >> player.redCards;
+        if (cin.fail()) {
+            cin.clear();  // Сбрасываем флаг ошибки
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очищаем буфер ввода
+            cout << "Ошибка ввода. Введите цифру." << endl;
+        }
     } while (player.redCards < 0 || player.redCards > player.gamesPlayed);
 
     players.push_back(player);
     cout << "Игрок добавлен." << endl;
 }
+
 
 void editPlayer(vector<Player>& players) {
     int index;
@@ -273,12 +283,6 @@ void sortPlayers(vector<Player>& players, int field) {
         sort(players.begin(), players.end(), compareDateOfBirth);
         printPlayers(players);
         break;
-    //case 2:
-    //    sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
-    //        return a.gamesPlayed > b.gamesPlayed;
-    //        });
-    //    printPlayers(players);
-    //    break;
     case 2:
         sort(players.begin(), players.end(), [](const Player& a, const Player& b) {
             return a.goalsScored > b.goalsScored;
@@ -396,7 +400,7 @@ void displayMostUndisciplinedPlayer(const vector<Player>& players) {
 
 void findYoungHighScorers(const vector<Player>& players) {
     cout << "Игроки младше 20 лет, забившие более 2 голов:" << endl;
-    int currentYear = 2023; // Update to the current year if needed
+    int currentYear = 2023;
 
     for (const Player& player : players) {
         int birthYear = stoi(player.dateOfBirth.substr(6));
