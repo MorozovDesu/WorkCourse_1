@@ -310,8 +310,8 @@ void searchPlayers(const vector<Player>& players, const string& searchTerm) {
 
 void displayAbout() {
     cout << "О программе:" << endl;
-    cout << "Версия программы: 2.1" << endl;
-    cout << "Дата последних изменений: 2023-11-01" << endl;
+    cout << "Версия программы: 3.3" << endl;
+    cout << "Дата последних изменений: 2023-11-12" << endl;
     cout << "Автор: Морозов Дмитрий Игоревич,https://github.com/MorozovDesu " << endl;
 }
 
