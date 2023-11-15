@@ -435,8 +435,7 @@ void displayTopScorers(const vector<Player>& players) {
         const Player& player = topScorers[i];
         cout << "Игрок #" << i + 1 << ": " << player.fullName << " (Забитых мячей: " << player.goalsScored << ")" << endl;
     }
-}
-// Функция для вывода информации о самом недисциплинированном игроке
+}// Функция для вывода информации о самом недисциплинированном игроке
 void displayMostUndisciplinedPlayer(const vector<Player>& players) {
     // Инициализация переменных для отслеживания максимального количества карточек и указателя на игрока
     int maxCards = -1;
@@ -483,13 +482,11 @@ void findYoungHighScorers(const vector<Player>& players) {
     }
 }
 
-// Функция для отображения меню управления футболистами
 // Функция для отображения меню управления данными о футболистах
 void displayFootballMenu(vector<Player>& players, const string& filename) {
     // Переменные для хранения строковых данных
     string searchTerm;
     string newFilename;
-
     // Бесконечный цикл для отображения меню
     while (true) {
         // Вывод пунктов меню
@@ -510,7 +507,6 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
         // Ввод выбора пользователя
         int choice;
         cin >> choice;
-
         // Обработка ошибочного ввода
         if (!(choice)) {
             cin.clear();  // Сбрасываем флаг ошибки
@@ -589,20 +585,15 @@ void displayFootballMenu(vector<Player>& players, const string& filename) {
                 }
                 break;
             case 12:
-                // Возвращение в главное меню
                 cout << "Возвращение в главное меню." << endl;
                 return;
             default:
-                // Вывод сообщения об ошибке при недопустимом действии
                 cout << "Недопустимое действие." << endl;
                 break;
             }
         }
     }
 }
-
-
-// Главная функция программы
 int main() {
     // Устанавливаем глобальную локаль для корректного отображения символов
     locale::global(locale(""));
@@ -658,8 +649,35 @@ int main() {
                 displayAbout();
                 break;
             case 3:
-                // Вызываем функцию для отображения руководства
+                // Вызываем функцию для отображения руководства пользователя
+                displayUserManual();
+                break;
+            case 4:
+                // Вызываем функцию для отображения информации о задании
+                displayTask();
+                break;
+            case 5:
+                // Проверяем, были ли сохранены данные перед выходом
+                if (!dataSaved) {
+                    char saveChoice;
+                    cout << "Данные не были сохранены. Сохранить перед выходом? (y/n): ";
+                    cin >> saveChoice;
+                    if (saveChoice == 'y' || saveChoice == 'Y') {
+                        // Сохраняем данные в файл и устанавливаем флаг сохранения
+                        saveDataToFile(players, filename);
+                        cout << "Данные успешно сохранены перед выходом." << endl;
+                    }
+                }
+                // Выводим сообщение о завершении программы и завершаем выполнение
+                cout << "Программа завершена." << endl;
+                return 0;
+            default:
+                // Выводим сообщение об ошибке при недопустимом действии
+                cout << "Недопустимое действие." << endl;
+                break;
             }
         }
     }
+
+    return 0;
 }
