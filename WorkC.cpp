@@ -175,43 +175,58 @@ void addPlayer(vector<Player>& players) {
     do {
         cout << "Количество игр: ";
         cin >> player.gamesPlayed;
-        if (cin.fail()) {
+        // Проверка на корректность ввода
+        if (cin.fail() || player.gamesPlayed < 0 || player.gamesPlayed > 10000) {
             cin.clear();  // Сброс флага ошибки
             cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очистка буфера ввода
-            cout << "Ошибка ввода. Введите цифру." << endl;
+            cout << "Ошибка ввода. Введите корректное число игр (от 0 до 10000)." << endl;
         }
-    } while (player.gamesPlayed < 0 || player.gamesPlayed > 10000);
+        else {
+            break;  // Выход из цикла при корректном вводе
+        }
+    } while (true);
     // Ввод количества забитых мячей (только цифры)
     do {
         cout << "Количество забитых мячей: ";
         cin >> player.goalsScored;
-        if (cin.fail()) {
+        // Проверка на корректность ввода
+        if (cin.fail() || player.goalsScored < 0 || player.goalsScored > 10000) {
             cin.clear();  // Сброс флага ошибки
             cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очистка буфера ввода
-            cout << "Ошибка ввода. Введите цифру." << endl;
+            cout << "Ошибка ввода. Введите корректное число забитых мячей (от 0 до 10000)." << endl;
         }
-    } while (player.goalsScored < 0 || player.goalsScored > 10000);
+        else {
+            break;  // Выход из цикла при корректном вводе
+        }
+    } while (true);
     // Ввод количества желтых карточек (только цифры)
     do {
         cout << "Количество желтых карточек: ";
         cin >> player.yellowCards;
-        if (cin.fail()) {
+        // Проверка на корректность ввода
+        if (cin.fail() || player.yellowCards < 0 || player.yellowCards > 20000) {
             cin.clear();  // Сброс флага ошибки
             cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очистка буфера ввода
-            cout << "Ошибка ввода. Введите цифру." << endl;
+            cout << "Ошибка ввода. Введите корректное число желтых карточек (от 0 до 20000)." << endl;
         }
-    } while (player.yellowCards < 0 || player.yellowCards > 20000);
+        else {
+            break;  // Выход из цикла при корректном вводе
+        }
+    } while (true);
     // Ввод количества красных карточек (только цифры)
     do {
         cout << "Количество красных карточек (не больше количества игр " << player.gamesPlayed << "): ";
         cin >> player.redCards;
-        if (cin.fail()) {
+        // Проверка на корректность ввода
+        if (cin.fail() || player.redCards < 0 || player.redCards > player.gamesPlayed) {
             cin.clear();  // Сброс флага ошибки
             cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Очистка буфера ввода
-            cout << "Ошибка ввода. Введите цифру." << endl;
+            cout << "Ошибка ввода. Введите корректное число красных карточек (от 0 до " << player.gamesPlayed << ")." << endl;
         }
-    } while (player.redCards < 0 || player.redCards > player.gamesPlayed);
-
+        else {
+            break;  // Выход из цикла при корректном вводе
+        }
+    } while (true);
     // Добавление игрока в вектор
     players.push_back(player);
     cout << "Игрок добавлен." << endl;
